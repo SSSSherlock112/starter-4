@@ -1,0 +1,105 @@
+<template>
+  <h1 >Messages Board</h1>
+  <div class="container">
+    <UChatMessages status="submitted" :messages="messages" />
+  </div>
+  <div>
+    <UTextarea size="xl" v-model="value" class="borad" placeholder="写下你的留言让我们变得更好！"/>
+  </div>
+  <div class="send">
+    <UButton size="lg" color="primary">发送留言</UButton>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue'
+
+type MessagePart = {
+  type: string
+  text: string
+}
+
+type Message = {
+  id: string
+  role: 'user' | 'assistant' | 'system'
+  parts: MessagePart[]
+}
+
+const value = ref('')
+const messages = ref<Message[]>([
+  {
+    id: '1',
+    role: 'user',
+    parts: [
+      {
+        type: 'text',
+        text: 'Hello, how are you?'
+      }
+    ]
+  },
+  {
+    id: '2',
+    role: 'assistant',
+    parts: [
+      {
+        type: 'text',
+        text: 'I am doing well, thank you for asking! How can I assist you today?'
+      }
+    ]
+  },
+  {
+    id: '3',
+    role: 'user',
+    parts: [
+      {
+        type: 'text',
+        text: 'What is the current weather in Tokyo?'
+      }
+    ]
+  },
+  {
+    id: '4',
+    role: 'assistant',
+    parts: [
+      {
+        type: 'text',
+        text: "Based on the latest data, Tokyo is currently experiencing sunny weather with temperatures around 24°C (75°F). It's a beautiful day with clear skies."
+      }
+    ]
+  }
+])
+</script>
+
+<style scoped>
+h1{
+  top: 10%;
+  left: 50%;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  font-size: 24px;
+  font-weight: bold;
+  color: oklch(72.3% 0.219 149.579);
+}
+.borad {
+  top:70%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  position: absolute;
+  width: 500px;
+  height: 300px;
+}
+.send {
+  top: 80%;
+  left: 50%;
+  position: absolute;
+  transform: translate(-50%, -50%);
+}
+.container {
+  top: 20%;
+  left: 50%;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  border: 1px solid ;
+  border-radius: 5px;
+}
+</style>
