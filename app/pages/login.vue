@@ -101,6 +101,10 @@ const onSubmit = async () => {
   }
 }
 
+useHead({
+  title: 'Login / Register - Messages Board',
+})
+
 const toggleMode = () => {
   mode.value = mode.value === 'login' ? 'register' : 'login'
   error.value = ''
