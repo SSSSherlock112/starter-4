@@ -1,15 +1,15 @@
 <template>
   <h1>{{ mode === 'login' ? '留言板 · 登录' : '留言板 · 注册' }}</h1>
   <div class="login-page">
-    <form @submit.prevent="onSubmit" class="card">
+    <form @submit.prevent="onSubmit" class="card" novalidate>
       <div class="field">
         <label for="email">邮箱</label>
-        <input id="email" type="email" v-model="email" placeholder="you@example.com" required />
+        <input id="email" type="email" v-model="email" placeholder="you@example.com" autocomplete="email" required />
       </div>
 
       <div class="field">
         <label for="password">密码</label>
-        <input id="password" type="password" v-model="password" placeholder="至少 6 位" minlength="6" required />
+        <input id="password" type="password" v-model="password" placeholder="至少 6 位" minlength="6" autocomplete="current-password" required />
       </div>
 
       <div class="actions">

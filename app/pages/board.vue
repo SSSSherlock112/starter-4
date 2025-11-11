@@ -125,8 +125,8 @@ h1 {
   left: 50%;
   transform: translate(-50%, -50%);
   position: absolute;
-  width: 500px;
-  height: 300px;
+  width: 25%;
+  height: 20%;
 }
 
 .send {
@@ -143,8 +143,8 @@ h1 {
   transform: translate(-50%, -50%);
   border: 1px solid #e5e7eb;
   border-radius: 5px;
-  width: 1000px;
-  height: 400px;
+  width: 60%;
+  height: 45%;
   overflow-y: auto;
   padding: 10px;
   background-color: white;
