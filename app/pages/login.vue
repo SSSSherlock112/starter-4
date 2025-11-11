@@ -13,7 +13,8 @@
       </div>
 
       <div class="actions">
-        <button class="primary" type="submit" :disabled="loading">{{ mode === 'login' ? (loading ? '登录中...' : '登录') : (loading ? '注册中...' : '注册') }}</button>
+        <button v-if="mode === 'login'" class="primary" type="submit" :disabled="loading">{{ loading ? '登录中...' : '登录' }}</button>
+        <button v-else class="secondary" type="submit" :disabled="loading">{{ loading ? '注册中...' : '注册' }}</button>
       </div>
 
       <div class="spacer-line" aria-hidden="true"><hr /></div>
@@ -58,44 +59,85 @@ const validate = () => {
 }
 
 const onSubmit = async () => {
-  if (!validate()) return
+  if (mode.value === 'login') {
+    await onLogin()
+  } else {
+    await onRegister()
+  }
+}
 
+const formatAuthError = (err: any) => {
+  if (!err) return '发生未知错误'
+  const msg = (err.message || String(err)).toLowerCase()
+  const status = err.status || err.code || ''
+
+  if (/invalid login credentials|invalid_credentials|invalid login|invalid password/i.test(msg)) {
+    return '邮箱或密码不正确'
+  }
+
+  return (err.message && String(err.message)) || String(err)
+}
+
+ const onLogin = async () => {
+  if (!validate()) return
+  
+  loading.value = true
+  error.value = ''
+  
+  try {
+    const { data, error: supError } = await supabase.auth.signInWithPassword({
+      email: email.value.trim(),
+      password: password.value
+    })
+
+    if (supError) {
+      error.value = supError.message || '登录失败'
+      return
+    }
+
+    await new Promise(resolve => setTimeout(resolve, 100))
+    
+    const { data: sessionData } = await supabase.auth.getSession()
+    
+    if (sessionData.session) {
+      console.log('跳转到看板页面')
+      await router.push('/board')
+      console.log('跳转完成')
+    } else {
+      console.error('登录成功但无会话')
+      error.value = '登录状态异常，请重试'
+    }
+    
+  } catch (e: any) {
+    console.error('登录异常:', e)
+    error.value = e?.message || '网络错误'
+  } finally {
+    loading.value = false
+  }
+}
+
+const onRegister = async () => {
+  if (!validate()) return
   loading.value = true
   message.value = ''
   error.value = ''
-
   try {
-    if (mode.value === 'register') {
-      const { data, error: supError } = await supabase.auth.signUp({
-        email: email.value,
-        password: password.value
-      })
+    const { data, error: supError } = await supabase.auth.signUp({
+      email: email.value,
+      password: password.value
+    })
 
-      if (supError) {
-        error.value = supError.message || String(supError)
-      } else {
-        if (data && (data as any).session) {
-          await router.push('/board')
-        } else {
-          message.value = '注册成功，请检查你的邮箱完成确认。'
-        }
-      }
-
+    if (supError) {
+      error.value = formatAuthError(supError)
     } else {
-      const { data, error: supError } = await supabase.auth.signInWithPassword({
-        email: email.value,
-        password: password.value
-      })
-
-      if (supError) {
-        error.value = supError.message || String(supError)
-      } else {
-        // 登录成功
+      if (data && (data as any).session) {
         await router.push('/board')
+      } else {
+        message.value = '注册成功，请检查你的邮箱完成确认。'
       }
     }
   } catch (e: any) {
-    error.value = e?.message || String(e)
+    error.value = e?.message ? `网络错误：${e.message}` : '网络错误，请稍后重试'
   } finally {
     loading.value = false
   }
@@ -167,6 +209,14 @@ h1 {
   background:oklch(72.3% 0.219 149.579);
   color:white;
   cursor:pointer;
+}
+.actions .secondary {
+  padding: 10px 14px;
+  border-radius:6px;
+  border: 1px solid #c7d2fe;
+  background: white;
+  color: oklch(72.3% 0.219 149.579);
+  cursor: pointer;
 }
 .footer {
   display:flex;
